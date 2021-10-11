@@ -69,7 +69,7 @@ msgid "Specific symbol"
 msgstr "Símbolo específico"
 
 #: pdf.py:221
-msgid "List of items"
+msgid "Items"
 msgstr "Relação de itens"
 
 #: pdf.py:223
@@ -81,11 +81,11 @@ msgid "Units"
 msgstr "Unidades"
 
 #: pdf.py:229 pdf.py:242
-msgid "Price per one"
+msgid "unit price"
 msgstr "Preço unitário"
 
 #: pdf.py:231 pdf.py:244
-msgid "Total price"
+msgid "Cost"
 msgstr "Preço total"
 
 #: pdf.py:233 pdf.py:335

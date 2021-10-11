@@ -8,7 +8,7 @@ from .pdf import BaseInvoice
 
 logger = logging.getLogger(__name__)
 
-__all__ = ['SimpleInvoice']
+__all__ = ["SimpleInvoice"]
 
 
 class SimpleInvoice(BaseInvoice):
@@ -22,9 +22,9 @@ class SimpleInvoice(BaseInvoice):
     """
 
     tax_rates = {
-        'high': 21,
-        'low': 15,
-        'none': 0,
+        "high": 21,
+        "low": 15,
+        "none": 0,
     }
     _dat_ns = "http://www.stormware.cz/schema/version_2/data.xsd"
     _inv_ns = "http://www.stormware.cz/schema/version_2/invoice.xsd"
@@ -40,17 +40,21 @@ class SimpleInvoice(BaseInvoice):
     def _add_item(self, xml_invoice, item):
         invoice_item = ET.SubElement(xml_invoice, "{%s}invoiceItem" % self._inv_ns)
 
-        ET.SubElement(invoice_item, '{%s}quantity' % self._inv_ns).text = str(item.count)
-        ET.SubElement(invoice_item, '{%s}unit' % self._inv_ns).text = str(item.unit)
-        home_currency = ET.SubElement(invoice_item, '{%s}homeCurrency' % self._inv_ns)
+        ET.SubElement(invoice_item, "{%s}quantity" % self._inv_ns).text = str(item.count)
+        ET.SubElement(invoice_item, "{%s}unit" % self._inv_ns).text = str(item.unit)
+        home_currency = ET.SubElement(invoice_item, "{%s}homeCurrency" % self._inv_ns)
 
-        ET.SubElement(home_currency, '{%s}unitPrice' % self._typ_ns).text = str(item.price)
+        ET.SubElement(home_currency, "{%s}unitPrice" % self._typ_ns).text = str(item.price)
 
-        ET.SubElement(invoice_item, '{%s}text' % self._inv_ns).text = str(item.description)[:90]
+        ET.SubElement(invoice_item, "{%s}text" % self._inv_ns).text = str(item.description)[:90]
         if item.tax in self.inv_tax_rates:
-            ET.SubElement(invoice_item, '{%s}rateVAT' % self._inv_ns).text = self.inv_tax_rates[item.tax]
+            ET.SubElement(invoice_item, "{%s}rateVAT" % self._inv_ns).text = self.inv_tax_rates[
+                item.tax
+            ]
         else:
-            logger.warning("Tax rate %s is not among the tax rates accepted by Pohoda system" % item.tax)
+            logger.warning(
+                "Tax rate %s is not among the tax rates accepted by Pohoda system" % item.tax
+            )
 
         return invoice_item
 
@@ -59,31 +63,33 @@ class SimpleInvoice(BaseInvoice):
             if content is not None:
                 if type(content) == datetime.date:
                     content = content.isoformat()
-                ET.SubElement(parrent_element, '{%s}%s' % (namespace, element)).text = str(content)
+                ET.SubElement(parrent_element, "{%s}%s" % (namespace, element)).text = str(content)
 
     def _format_address(self, address, to_element, my_address=False):
-        address_element = ET.SubElement(to_element, '{%s}address' % self._typ_ns)
+        address_element = ET.SubElement(to_element, "{%s}address" % self._typ_ns)
         element_map = {
-            'company': address.summary,
-            'street': address.address[:64],
-            'city': address.city[:45],
-            'zip': address.zip_code[:15],
-            'phone': address.phone[:40],
-            'ico': address.ir,
-            'dic': address.vat_id,
-            'email': address.email,
+            "company": address.summary,
+            "street": address.address[:64],
+            "city": address.city[:45],
+            "zip": address.zip_code[:15],
+            "phone": address.phone[:40],
+            "ico": address.ir,
+            "dic": address.vat_id,
+            "email": address.email,
         }
         if not my_address:  # Division element is not present in my address
-            element_map.update({
-                'division': address.division[:32] if address.division else None,
-                'country': address.country,
-            })
+            element_map.update(
+                {
+                    "division": address.division[:32] if address.division else None,
+                    "country": address.country,
+                }
+            )
         self.add_elements(address_element, self._typ_ns, element_map)
 
     def _invoice_header(self, invoice_header):
         ET.SubElement(invoice_header, "{%s}invoiceType" % self._inv_ns).text = "issuedInvoice"
         number = ET.SubElement(invoice_header, "{%s}number" % self._inv_ns)
-        self.add_elements(number, self._typ_ns, {'numberRequested': self.invoice.number})
+        self.add_elements(number, self._typ_ns, {"numberRequested": self.invoice.number})
 
         header_element_map = {
             "date": self.invoice.date,
@@ -115,9 +121,13 @@ class SimpleInvoice(BaseInvoice):
         for rate_ident, rate in self.tax_rates.items():
             if rate in breakdown:
                 rate_camel = rate_ident.capitalize()
-                ET.SubElement(home_currency, '{%s}price%s' % (self._typ_ns, rate_camel)).text = str(breakdown[rate]['total_tax'])
-                if rate_ident != 'none':
-                    ET.SubElement(home_currency, '{%s}price%sVAT' % (self._typ_ns, rate_camel)).text = str(breakdown[rate]['tax'])
+                ET.SubElement(home_currency, "{%s}price%s" % (self._typ_ns, rate_camel)).text = str(
+                    breakdown[rate]["total_tax"]
+                )
+                if rate_ident != "none":
+                    ET.SubElement(
+                        home_currency, "{%s}price%sVAT" % (self._typ_ns, rate_camel)
+                    ).text = str(breakdown[rate]["tax"])
 
     def gen(self, filename):
         """
@@ -126,9 +136,9 @@ class SimpleInvoice(BaseInvoice):
         :param filename: file in which the XML invoice will be written
         :type filename: string or File
         """
-        ET.register_namespace('dat', self._dat_ns)
-        ET.register_namespace('inv', self._inv_ns)
-        ET.register_namespace('typ', self._typ_ns)
+        ET.register_namespace("dat", self._dat_ns)
+        ET.register_namespace("inv", self._inv_ns)
+        ET.register_namespace("typ", self._typ_ns)
 
         data_pack = ET.Element(
             "{%s}dataPack" % self._dat_ns,
@@ -138,7 +148,9 @@ class SimpleInvoice(BaseInvoice):
             application="InvoiceGenerator",
             note="Generated from InvoiceGenerator",
         )
-        data_pack_item = ET.SubElement(data_pack, "{%s}dataPackItem" % self._dat_ns, version="2.0", id=self.invoice.number)
+        data_pack_item = ET.SubElement(
+            data_pack, "{%s}dataPackItem" % self._dat_ns, version="2.0", id=self.invoice.number
+        )
         xml_invoice = ET.SubElement(data_pack_item, "{%s}invoice" % self._inv_ns, version="2.0")
 
         invoice_header = ET.SubElement(xml_invoice, "inv:invoiceHeader")

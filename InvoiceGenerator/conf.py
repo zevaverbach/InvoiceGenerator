@@ -4,17 +4,18 @@ import sys
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(os.path.join(__file__)))
 
-LANGUAGE = 'cs'
+LANGUAGE = "cs"
 
 
 def get_gettext(lang):
     import gettext
-    path = os.path.join(PROJECT_ROOT, 'locale')
+
+    path = os.path.join(PROJECT_ROOT, "locale")
     t = gettext.translation(
-        'messages',
+        "messages",
         path,
         languages=[lang],
-        codeset='utf8',
+        codeset="utf8",
         fallback=True,
     )
     t.install()
@@ -29,10 +30,16 @@ try:
     lang = os.environ.get("INVOICE_LANG", LANGUAGE)
     _ = get_gettext(lang)
 except IOError:
-    def _(x): x
+
+    def _(x):
+        x
+
     print("Fix this!")
 except ImportError:
-    def _(x): x
+
+    def _(x):
+        x
+
 
 FONT_PATH = os.path.join(PROJECT_ROOT, "fonts", "DejaVuSans.ttf")
 FONT_BOLD_PATH = os.path.join(PROJECT_ROOT, "fonts", "DejaVuSans-Bold.ttf")
