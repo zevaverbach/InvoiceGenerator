@@ -56,7 +56,6 @@ class Invoice:
     items = []
     title = "Faktura"
     vs = "00000000"
-    creator = ""
     sign_image = None
     payment_days = 14
     paytype = "Převodem"
@@ -96,9 +95,6 @@ class Invoice:
 
     def setVS(self, value):
         self.vs = value
-
-    def setCreator(self, value):
-        self.creator = value
 
     def setPaytype(self, value):
         self.paytype = value
@@ -265,8 +261,6 @@ Variabilní symbol: %s"""
         path.lineTo((LEFT + 164) * mm, (TOP - i - 70) * mm)
         self.pdf.drawPath(path, True, True)
 
-        self.pdf.drawString((LEFT + 112) * mm, (TOP - i - 75) * mm, "Vystavil: %s" % self.creator)
-
     def drawDates(self, TOP, LEFT):
         today = datetime.datetime.today()
         payback = today + datetime.timedelta(self.payment_days)
@@ -332,7 +326,6 @@ if __name__ == "__main__":
     invoice.setProvider(provider)
     invoice.setTitle("Faktura")
     invoice.setVS("00001")
-    invoice.setCreator("Adam Štrauch")
     invoice.addItem(item1)
     invoice.addItem(item2)
 

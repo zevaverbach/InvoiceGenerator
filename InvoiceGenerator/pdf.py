@@ -171,9 +171,7 @@ class SimpleInvoice(BaseInvoice):
     #############################################################
 
     def _addMetaInformation(self, pdf):
-        pdf.setCreator(self.invoice.provider.summary)
         pdf.setTitle(self.invoice.title)
-        pdf.setAuthor(self.invoice.creator.name)
 
     def _drawTitle(self):
         # Up line
@@ -563,33 +561,6 @@ class SimpleInvoice(BaseInvoice):
                 fill=False,
             )  # 140,142
 
-        self._drawCreator(TOP - i - 20, self.LEFT + 98)
-
-    def _drawCreator(self, TOP, LEFT):
-        height = 20 * mm
-        if self.invoice.creator.stamp_filename:
-            im = Image.open(self.invoice.creator.stamp_filename)
-            height = float(im.size[1]) / (float(im.size[0]) / 200.0)
-            self.pdf.drawImage(
-                self.invoice.creator.stamp_filename,
-                (LEFT) * mm,
-                (TOP - 2) * mm - height,
-                200,
-                height,
-                mask="auto",
-            )
-
-        path = self.pdf.beginPath()
-        path.moveTo((LEFT + 8) * mm, (TOP) * mm - height)
-        path.lineTo((LEFT + self.line_width) * mm, (TOP) * mm - height)
-        self.pdf.drawPath(path, True, True)
-
-        self.pdf.drawString(
-            (LEFT + 10) * mm,
-            (TOP - 5) * mm - height,
-            "%s: %s" % (_(u"Creator"), self.invoice.creator.name),
-        )
-
     def _drawQR(self, TOP, LEFT, size=130.0):
         if self.qr_builder:
             qr_filename = self.qr_builder.filename
@@ -697,9 +668,6 @@ class CorrectingInvoice(SimpleInvoice):
 
 
 class ProformaInvoice(SimpleInvoice):
-    def _drawCreator(self, TOP, LEFT):
-        return
-
     def _drawTitle(self):
         # Up line
         self.pdf.drawString(self.LEFT * mm, self.TOP * mm, self.invoice.title)

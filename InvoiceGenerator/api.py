@@ -8,7 +8,7 @@ from InvoiceGenerator.conf import _
 
 import qrcode
 
-__all__ = ["Address", "Client", "Provider", "Creator", "Item", "Invoice"]
+__all__ = ["Address", "Client", "Provider", "Item", "Invoice"]
 
 
 class UnicodeProperty(object):
@@ -145,21 +145,6 @@ class Provider(Address):
     pass
 
 
-class Creator(UnicodeProperty):
-    """
-    Definition of creator of the invoice (ussually an accountant).
-
-    :param name: name of the issuer
-    :param stamp_filename: path to file with stamp (or subscription)
-    """
-
-    _attrs = ("name", "stamp_filename")
-
-    def __init__(self, name, stamp_filename=""):
-        self.name = name
-        self.stamp_filename = stamp_filename
-
-
 class Item(object):
     """
     Item on the invoice.
@@ -246,8 +231,6 @@ class Invoice(UnicodeProperty):
 
     :param client: client of the invoice
     :type client: Client
-    :param creator: creator of the invoice
-    :type creator: Creator
     :param provider: provider of the invoice
     :type provider: Provider
     """
@@ -288,14 +271,12 @@ class Invoice(UnicodeProperty):
     #: Use this parameter to set different rounding strategy.
     rounding_strategy = decimal.ROUND_HALF_EVEN
 
-    def __init__(self, client, provider, creator):
+    def __init__(self, client, provider):
         assert isinstance(client, Client)
         assert isinstance(provider, Provider)
-        assert isinstance(creator, Creator)
 
         self.client = client
         self.provider = provider
-        self.creator = creator
         self._items = []
 
         for attr in self._attrs:
@@ -387,8 +368,8 @@ class Correction(Invoice):
         "taxable_date",
     )
 
-    def __init__(self, client, provider, creator):
-        super(Correction, self).__init__(client, provider, creator)
+    def __init__(self, client, provider):
+        super(Correction, self).__init__(client, provider)
 
 
 class QrCodeBuilder(object):
